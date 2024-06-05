@@ -40,13 +40,16 @@ var tasks = map[string]Task{
 	},
 }
 
-func getTasks(w http.ResponseWriter, r *http.Request) { // Изменено название функции
+func getTasks(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
 	tasksList := make([]Task, 0, len(tasks))
 	for _, task := range tasks {
 		tasksList = append(tasksList, task)
 	}
-	json.NewEncoder(w).Encode(tasksList)
-	w.Header().Set("Content-Type", "application/json")
+	if err := json.NewEncoder(w).Encode(tasksList); err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
 	w.WriteHeader(http.StatusOK)
 }
 
@@ -88,7 +91,7 @@ func deleteTask(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 	r := chi.NewRouter()
-	r.Get("/tasks", getTasks) // Изменено название функции
+	r.Get("/tasks", getTasks)
 	r.Post("/tasks", addTask)
 	r.Get("/tasks/{id}", getTask)
 	r.Delete("/tasks/{id}", deleteTask)
