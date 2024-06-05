@@ -8,7 +8,6 @@ import (
 	"github.com/go-chi/chi/v5"
 )
 
-// Task ...
 type Task struct {
 	ID           string   `json:"id"`
 	Description  string   `json:"description"`
@@ -54,6 +53,7 @@ func getTasks(w http.ResponseWriter, r *http.Request) {
 }
 
 func addTask(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
 	var newTask Task
 	err := json.NewDecoder(r.Body).Decode(&newTask)
 	if err != nil {
@@ -61,11 +61,11 @@ func addTask(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	tasks[newTask.ID] = newTask
-	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
 }
 
 func getTask(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
 	id := chi.URLParam(r, "id")
 	task, ok := tasks[id]
 	if !ok {
@@ -73,11 +73,11 @@ func getTask(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	json.NewEncoder(w).Encode(task)
-	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 }
 
 func deleteTask(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
 	id := chi.URLParam(r, "id")
 	_, ok := tasks[id]
 	if !ok {
@@ -85,7 +85,6 @@ func deleteTask(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	delete(tasks, id)
-	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 }
 
