@@ -60,6 +60,10 @@ func addTask(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Bad Request", http.StatusBadRequest)
 		return
 	}
+	if _, exists := tasks[newTask.ID]; exists {
+		http.Error(w, "Conflict", http.StatusConflict)
+		return
+	}
 	tasks[newTask.ID] = newTask
 	w.WriteHeader(http.StatusCreated)
 }
@@ -69,7 +73,7 @@ func getTask(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 	task, ok := tasks[id]
 	if !ok {
-		http.Error(w, "Not Found", http.StatusNotFound)
+		http.Error(w, "Bad Request", http.StatusBadRequest)
 		return
 	}
 	json.NewEncoder(w).Encode(task)
